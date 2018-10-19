@@ -1,15 +1,17 @@
 # myAutomationScripts
 Fun scripts to automate boring manual tasks :+1:
 
+All scripts require Python 3.X
+
 
 ## batchCreateDeliveredEstimate.py
 This script will automatically create a batch of assignments, which in turn are pushed all the way through the claim creation and estimate delivery workflow. The script will prompt the user in `terminal` to enter the number of estimates they would like to deliver. There is a small amount of setup work required for each user:
 
 **Pre-requisite non-standard python libraries:**
-- selenium (via pip install)
+- selenium (via `pip install`)
 - ChromeDriver
   - https://pypi.org/project/chromedriver_installer/
-- names (via pip install)
+- names (via `pip install`)
   - Generates random name for each assignment
   
 **Changes required in the script:**
@@ -23,10 +25,10 @@ This script will automatically create a batch of assignments, which in turn are 
 This script will automatically create a batch of assignments. The script will prompt the user in `terminal` to enter the number of assignments they would like to create. There is a small amount of setup work required for each user:
 
 **Pre-requisite non-standard python libraries:**
-- selenium (via pip install)
-- names (via pip install)
+- selenium (via `pip install`)
+- names (via `pip install`)
   - Generates random name for each assignment
-- Firefox browser should be installed on the computer. Also requires 
+- Firefox browser should be installed on the machine
   
 **Changes required in the script:**
 - Comment out all QA servers other than the one of interest (two locations--*before* and *within* the `for` loop)
@@ -38,10 +40,10 @@ This script will automatically create a batch of assignments. The script will pr
 This script will automatically push a claim through the estimate delivery workflow. The script takes one command line argument in the form of the URL to the **claim** in **CORE**. The script will throw an exception if the wrong URL has been included, or if the URL is not properly formatted. There is a small amount of setup work required for each user:
 
 **Pre-requisite non-standard python libraries:**
-- selenium (via pip install)
+- selenium (via `pip install`)
 - ChromeDriver
   - https://pypi.org/project/chromedriver_installer/
-- validators (via pip install)
+- validators (via `pip install`)
   - Used to check for proper URL formatting
   
 **Changes required in the script:**
@@ -52,3 +54,15 @@ This script will automatically push a claim through the estimate delivery workfl
 
 **Limitations:**
 - The script is not currently set up to handle claims which have been marked as `ptl == true`
+
+## policyCreate.py
+This script will automatically create a new Policy Request (single vehicle) on the Policy portal. There is a small amount of setup work required for each user:
+
+**Pre-requisite non-standard python libraries:**
+- selenium (via `pip install`)
+- names (via `pip install`)
+  - Generates random name for each policy
+  
+**Changes required in the script:**
+- Alter the string sent to `loginEmail` to match intended user's username for the target server
+- Alter the string sent to `loginPwd` to match intended user's password for the target server
