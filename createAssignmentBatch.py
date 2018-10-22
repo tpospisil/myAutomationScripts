@@ -1,5 +1,12 @@
 #! python3/usr/bin/env
 
+def formatDateTime(currentDateTime):
+    if currentDateTime < 10:
+        currentDateTime = '0' + str(currentDateTime)
+    else:
+        currentDateTime = str(currentDateTime)
+    return currentDateTime
+
 def main():
 
     import datetime, time, names, random, sys
@@ -32,9 +39,9 @@ def main():
 
     # login to QA server
     loginEmail = browser.find_element_by_css_selector('#admin_user_email')
-    loginEmail.send_keys('fname.lname@snapsheet.me') # Modify to send user name
+    loginEmail.send_keys('FNAME.LNAME@snapsheet.me')
     loginPwd = browser.find_element_by_css_selector('#admin_user_password')
-    loginPwd.send_keys('PASSWORD') # Modify to send PASSWORD
+    loginPwd.send_keys('PASSWORD')
     loginButton = browser.find_element_by_css_selector('#admin_user_submit_action > input:nth-child(1)')
     loginButton.click()
 
@@ -44,26 +51,11 @@ def main():
         now = datetime.datetime.now()
 
         # Append '0' if month, day, hour, or minute is less than 10
-        if now.month < 10:
-            month = '0' + str(now.month)
-        else:
-            month = str(now.month)
-        if now.day < 10:
-            day = '0' + str(now.day)
-        else:
-            day = str(now.day)
-        if now.hour < 10:
-            hour = '0' + str(now.hour)
-        else:
-            hour = str(now.hour)
-        if now.minute < 10:
-            minute = '0' + str(now.minute)
-        else:
-            minute = str(now.minute)
-        if now.second < 10:
-            second = '0' + str(now.second)
-        else:
-            second = str(now.second)
+        month = formatDateTime(now.month)
+        day = formatDateTime(now.day)
+        hour = formatDateTime(now.hour)
+        minute = formatDateTime(now.minute)
+        second = formatDateTime(now.second)
 
         # Create claim number (with date/time stamp) and random owner name
         claimNo = 'test' + month + day + hour + minute + second
