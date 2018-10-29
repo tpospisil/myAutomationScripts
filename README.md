@@ -29,6 +29,7 @@ This script will automatically create a batch of assignments. The script will pr
 - names (via `pip install`)
   - Generates random name for each assignment
 - Firefox browser should be installed on the machine
+  - https://github.com/mozilla/geckodriver/releases
   
 **Changes required in the script:**
 - Comment out all QA servers other than the one of interest (two locations--*before* and *within* the `for` loop)
@@ -60,6 +61,8 @@ This script will automatically create a new Policy Request (single vehicle) on t
 
 **Pre-requisite non-standard python libraries:**
 - selenium (via `pip install`)
+- ChromeDriver
+  - https://pypi.org/project/chromedriver_installer/
 - names (via `pip install`)
   - Generates random name for each policy
   
