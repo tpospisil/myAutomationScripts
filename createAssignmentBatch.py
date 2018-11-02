@@ -130,10 +130,24 @@ def main():
         time.sleep(1)
         locationType.select_by_visible_text('Home')
         copyAddress.click()
+        time.sleep(1)
 
         # Click 'Create Assignment' and we're golden
         createAssignment = browser.find_element_by_css_selector('.actions > ol:nth-child(1) > li:nth-child(1) > input:nth-child(1)')
         createAssignment.click()
+
+        vice = browser.find_element_by_css_selector('span.action_item:nth-child(5) > a:nth-child(1)')
+        vice.click()
+        pendingLiability = browser.find_element_by_css_selector('div._1Nk1eVsTY21EpHl0cvoANa:nth-child(1) > label:nth-child(1) > div:nth-child(1) > input:nth-child(1)').is_selected()
+        if pendingLiability == False:
+            continue
+        else:
+            pendingLiabSwitch = browser.find_element_by_css_selector('div._1Nk1eVsTY21EpHl0cvoANa:nth-child(1) > label:nth-child(1) > div:nth-child(1) > span:nth-child(2)')
+            pendingLiabSwitch.click()
+            time.sleep(1)
+            confirmPL = browser.find_element_by_css_selector('body > div:nth-child(2) > div > div.ss-modal > div.ss-modal__actions > div > button.ss-btn.ss-btn-secondary-dark')
+            confirmPL.click()
+            time.sleep(1)
 
     browser.quit()
 
