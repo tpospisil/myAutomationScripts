@@ -69,3 +69,15 @@ This script will automatically create a new Policy Request (single vehicle) on t
 **Changes required in the script:**
 - Alter the string sent to `loginEmail` to match intended user's username for the target server
 - Alter the string sent to `loginPwd` to match intended user's password for the target server
+
+## exposureCreate.py
+Creates an claim and adds a single exposure in the `vice-frontend-integration` environment.
+
+**Changes required in the script:**
+- User will need to input their own email, password and phone number
+
+## addExposureToClaim.py
+Adds an exposure to an existing claim in the `vice-frontend-integration` environment. The script takes one command line argument in the form of the URL to an existing claim's exposure list view page. The script will throw an exception if the wrong URL has been included, or if the URL is not properly formatted.
+
+**Changes required in the script:**
+- User will need to input their own email, password and phone number
