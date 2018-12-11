@@ -1,6 +1,6 @@
 #! python3/usr/bin/env
 
-import unittest, time, datetime, names, sys, random
+import unittest, time, datetime, names, sys, random, os, errno
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -8,27 +8,13 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 
+# Create test data
+now = datetime.datetime.now().strftime('%m%d%H%M%S')
 
-def formatDateTime(currentDateTime):
-    if currentDateTime < 10:
-        currentDateTime = '0' + str(currentDateTime)
-    else:
-        currentDateTime = str(currentDateTime)
-    return currentDateTime
+email = 'fname.lname@snapsheet.me'
 
-now = datetime.datetime.now()
-
-# Append '0' if month, day, hour, or minute is less than 10
-month = formatDateTime(now.month)
-day = formatDateTime(now.day)
-hour = formatDateTime(now.hour)
-minute = formatDateTime(now.minute)
-second = formatDateTime(now.second)
-
-email = 'INSERTEMAILHERE'
-
-claimNo = 'claim' + month + day + hour + minute + second
-policyNo = 'policy' + month + day + hour + minute + second
+claimNo = 'claim' + now
+policyNo = 'policy' + now
 
 firstName = names.get_first_name()
 lastName = names.get_last_name()
@@ -58,7 +44,7 @@ class ViceRegressionSuite(unittest.TestCase):
             email)
         self.driver.find_element_by_css_selector(
             '[data-test-id="login_form_password_input').send_keys(
-            "INSERTPASSWORDHERE")
+            "ENTERPASSWORDHERE")
         self.driver.find_element_by_css_selector(
             '#app > div > div > div._1lWQjoWRvEuXiIoWRyOPYh > div > div:nth-child(6) > button').click()
         time.sleep(2)
@@ -98,7 +84,7 @@ class ViceRegressionSuite(unittest.TestCase):
         # Verify that current handler is auto-populated
         handler = Select(self.driver.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[1]/div[1]/div/div/div/div/div/div/select'))
-        self.assertEqual('Tyler Tester', handler.first_selected_option.text)
+        self.assertEqual('FNAME LNAME', handler.first_selected_option.text)
 
         # Populate the available fields for the new exposure
         insuredOnPolicyCheck = self.driver.find_element_by_xpath(
@@ -126,7 +112,7 @@ class ViceRegressionSuite(unittest.TestCase):
             email)
         self.driver.find_element_by_xpath(
             '//label[@for="claimant.phone"]/following-sibling::input[1]').send_keys(
-            '3195412283')
+            'ENTERPHONENUMBERHERE')
         self.driver.find_element_by_xpath(
             '//label[@for="vehicle.registrationNumber"]/following-sibling::input[1]').send_keys(
             '182-D-12345')
@@ -362,17 +348,22 @@ class ViceRegressionSuite(unittest.TestCase):
             '[data-test-id="shop-locator-card-details"] > div > span._13AJpbnc8oWgP-TGazCoK6').text
         self.assertEqual(shopCardName, self.__class__.currentPinnedLocation[:len(shopCardName)])
 
+
     def test_8logout(self):
         # Log out
-        self.driver.find_element_by_css_selector('[data-icon="user"]').click()
+        self.driver.find_element_by_css_selector(
+            '[data-icon="user"]').click()
         time.sleep(1)
-        self.driver.find_element_by_css_selector('[data-test-id="app-header-logout"]').click()
+        self.driver.find_element_by_css_selector(
+            '[data-test-id="app-header-logout"]').click()
         self.assertEqual('https://vice-frontend-integration.snapsheet.tech/login', self.driver.current_url)
 
     def is_element_present(self, how, what):
         try:
             self.driver.find_element(by=how, value=what)
         except NoSuchElementException as e:
+            exceptionTime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            self.driver.get_screenshot_as_file('screenshot-%s.png' % exceptionTime)
             return False
         return True
 
