@@ -4,28 +4,14 @@ import time, datetime, names, sys
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
-def formatDateTime(currentDateTime):
-    if currentDateTime < 10:
-        currentDateTime = '0' + str(currentDateTime)
-    else:
-        currentDateTime = str(currentDateTime)
-    return currentDateTime
-
 def main():
 
-    now = datetime.datetime.now()
-
-    # Append '0' if month, day, hour, or minute is less than 10
-    month = formatDateTime(now.month)
-    day = formatDateTime(now.day)
-    hour = formatDateTime(now.hour)
-    minute = formatDateTime(now.minute)
-    second = formatDateTime(now.second)
+    now = datetime.datetime.now().strftime('%m%d%H%M%S')
 
     email = 'fname.lname@snapsheet.me'
 
-    claimNo = 'claim' + month + day + hour + minute + second
-    policyNo = 'policy' + month + day + hour + minute + second
+    claimNo = 'claim' + now
+    policyNo = 'policy' + now
 
     firstName = names.get_first_name()
     middleName = names.get_first_name()
@@ -93,7 +79,7 @@ def main():
         email)
     driver.find_element_by_xpath(
         '//label[@for="claimant.phone"]/following-sibling::input[1]').send_keys(
-        '3195412283')
+        'INSERTPHONENUMBERHERE')
     driver.find_element_by_xpath(
         '//label[@for="vehicle.registrationNumber"]/following-sibling::input[1]').send_keys(
         '182-D-12345')
