@@ -1,6 +1,6 @@
 #! python3/usr/bin/env
 
-import unittest, time, datetime, names, sys, random
+import unittest, time, datetime, names, sys, random, os, re
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -8,27 +8,13 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 
+# Create test data
+now = datetime.datetime.now().strftime('%m%d%H%M%S')
 
-def formatDateTime(currentDateTime):
-    if currentDateTime < 10:
-        currentDateTime = '0' + str(currentDateTime)
-    else:
-        currentDateTime = str(currentDateTime)
-    return currentDateTime
+email = 'tyler.pospisil+test@snapsheet.me'
 
-now = datetime.datetime.now()
-
-# Append '0' if month, day, hour, or minute is less than 10
-month = formatDateTime(now.month)
-day = formatDateTime(now.day)
-hour = formatDateTime(now.hour)
-minute = formatDateTime(now.minute)
-second = formatDateTime(now.second)
-
-email = 'INSERTEMAILHERE'
-
-claimNo = 'claim' + month + day + hour + minute + second
-policyNo = 'policy' + month + day + hour + minute + second
+claimNo = 'claim' + now
+policyNo = 'policy' + now
 
 firstName = names.get_first_name()
 lastName = names.get_last_name()
@@ -58,15 +44,18 @@ class ViceRegressionSuite(unittest.TestCase):
             email)
         self.driver.find_element_by_css_selector(
             '[data-test-id="login_form_password_input').send_keys(
-            "INSERTPASSWORDHERE")
+            "2Plustwoequalsfive!")
         self.driver.find_element_by_css_selector(
             '#app > div > div > div._1lWQjoWRvEuXiIoWRyOPYh > div > div:nth-child(6) > button').click()
         time.sleep(2)
 
     def test_2createClaim(self):
-        # Select the 'Create Claim' button
+        # Verify that the 'Start New Claim' button is present
+        self.assertTrue(self.is_element_present(By.CSS_SELECTOR, '#app > div > div > div.O2oH4V0LOoizIYDgzvgNj > div > div._266sD5YxjUkjzOakD2jBHv > button > span'))
+
+        # Select the 'Start New Claim' button
         self.driver.find_element_by_css_selector(
-            '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > div > button > span').click()
+            '#app > div > div > div.O2oH4V0LOoizIYDgzvgNj > div > div._266sD5YxjUkjzOakD2jBHv > button > span').click()
         time.sleep(1)
 
         # Verify that 'Create Claim' button is inactive without fields pre-populated
@@ -126,7 +115,7 @@ class ViceRegressionSuite(unittest.TestCase):
             email)
         self.driver.find_element_by_xpath(
             '//label[@for="claimant.phone"]/following-sibling::input[1]').send_keys(
-            '3195412283')
+            '13195412283')
         self.driver.find_element_by_xpath(
             '//label[@for="vehicle.registrationNumber"]/following-sibling::input[1]').send_keys(
             '182-D-12345')
@@ -181,8 +170,8 @@ class ViceRegressionSuite(unittest.TestCase):
 
     def test_4assignShopSendLink(self):
         # Verify that no shop has been assigned
-        self.assertEqual('No shop selected', self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[1]/div[2]/div[1]').text)
+        self.assertEqual('No repairer selected', self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[1]/div[1]/div[2]/div[1]').text)
 
         # Select the 'Shop Locator' button
         self.driver.find_element_by_css_selector(
@@ -237,8 +226,8 @@ class ViceRegressionSuite(unittest.TestCase):
         self.assertEqual(selectedShop, pinnedShopLocation[:-9])
         self.__class__.currentPinnedLocation = pinnedShopLocation
 
-        # With email option selected, select 'Assign Shop'
-        self.assertEqual('Assign Shop', self.driver.find_element_by_xpath(
+        # With email option selected, select 'Choose Repairer'
+        self.assertEqual('Choose Repairer', self.driver.find_element_by_xpath(
             '/html/body/div[2]/div[2]/div[2]/div[2]/div/button/span').text)
         self.driver.find_element_by_xpath(
             '/html/body/div[2]/div[2]/div[2]/div[2]/div/button/span').click()
@@ -246,10 +235,10 @@ class ViceRegressionSuite(unittest.TestCase):
 
         # Verify that correct info is listed in the modal. Then close the confirmation modal
         self.assertTrue(self.is_element_present(By.CSS_SELECTOR, '[data-icon="check-circle"]'))
-        self.assertEqual('Success!', self.driver.find_element_by_xpath(
-            '/html/body/div[2]/div[2]/div[2]/div/h3/span').text)
-        modalShopName = self.driver.find_element_by_xpath(
-            '/html/body/div[2]/div[2]/div[2]/div/div[2]/div/div/p[2]').text
+        self.assertEqual('Success!', self.driver.find_element_by_css_selector(
+            'body > div.ss-dialog-container > div.ss-modal._5fzyOIOFDaI25pzzd6cCA._3IhvwX95oYL3B6gkp2zbp5 > div._2d2aIauEx9OcfKTP8UdnkI > div > h4 > span').text)
+        modalShopName = self.driver.find_element_by_css_selector(
+            'body > div.ss-dialog-container > div.ss-modal._5fzyOIOFDaI25pzzd6cCA._3IhvwX95oYL3B6gkp2zbp5 > div._2d2aIauEx9OcfKTP8UdnkI > div > div:nth-child(3) > div > div > p._10jtKYUSboz7yNLC9xEx-').text
         self.assertEqual(modalShopName, selectedShop[:len(modalShopName)])
         self.driver.find_element_by_css_selector(
             '[data-test-id="locator-modal-close-button"]').click()
@@ -265,25 +254,25 @@ class ViceRegressionSuite(unittest.TestCase):
         self.driver.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[1]/div[4]/button[2]/span').click()
         self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[1]/div[1]/div').click()
+            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[1]').click()
         time.sleep(1)
-        customerLink = self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[2]/div/div/div/div/div[1]/p[3]/a').text
+        smsBody = self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[2]/div/div/div/div').text
+        locatorLink = re.search("(?P<url>https?://[^\s]+)", smsBody).group("url")
 
         # Navigate to customer link URL in a new browser session
-        self.driver2.get(customerLink)
+        self.driver2.get(locatorLink)
         time.sleep(2)
 
-        # Verify that current assigned shop's name is displayed on splash screen, then close splash screen
-        self.assertEqual(self.__class__.currentShopName, self.driver2.find_element_by_xpath(
-            '/html/body/div[2]/div[2]/div/div[2]').text)
-        self.driver2.find_element_by_css_selector(
-            '[data-test-id="vendor-locator-start-button"]').click()
+        # Verify that Zurich branding is displayed on browser page title and splash screen, then close splash screen
+        self.assertEqual('Zurich Ireland', self.driver2.title)
+        self.driver2.find_elements_by_link_text(
+            'click here')[1].click()
 
         # Verify that correct vehicle location and assigned shop location is listed in shop locator
         self.assertEqual(make + ' ' + model + ' 2018\n' + currentAddress + '\n' + currentCity + currentCounty, self.driver2.find_element_by_css_selector(
             '[data-test-id="location-item-wrapper"]').text)
-        self.assertEqual('Assigned Shop\n' + self.__class__.currentPinnedLocation, self.driver2.find_elements_by_css_selector(
+        self.assertEqual('Assigned Repairer\n' + self.__class__.currentPinnedLocation, self.driver2.find_elements_by_css_selector(
             '[data-test-id="location-item-wrapper"]')[1].text)
 
         # Select a new shop
@@ -298,11 +287,13 @@ class ViceRegressionSuite(unittest.TestCase):
         self.__class__.currentPinnedLocation = pinnedShopLocation
 
         # Select 'Assign Shop'
-        self.assertEqual('Change Shop', self.driver2.find_element_by_xpath(
+        self.assertEqual('Change Repairer', self.driver2.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div/div[2]/div/button/span').text)
         self.driver2.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div/div[2]/div/button/span').click()
         time.sleep(1)
+
+        # Verify that confirmation modal is presented and contains all expected information
         modalShopName = self.driver2.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div[2]').text
         self.assertEqual(modalShopName, selectedShop[:len(modalShopName)])
@@ -318,15 +309,15 @@ class ViceRegressionSuite(unittest.TestCase):
         self.driver.find_element_by_css_selector(
             '[data-test-id="app-header-search-input"]').send_keys(
             claimNo, Keys.ENTER)
-        time.sleep(1)
+        time.sleep(2)
         self.assertEqual('Search', self.driver.find_element_by_css_selector(
             '[data-test-id="app-header-wrapper"] > h1').text)
 
         # Locate newly-created claim by Claim Number
-        self.assertEqual(policyNo, self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/ul/div/div[2]/div/span/p/span[2]').text)
-        self.assertEqual(claimNo, self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/ul/div/div[3]/div/div/p[1]/a/span/em').text)
+        self.assertEqual(policyNo, self.driver.find_element_by_css_selector(
+            '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > div._29qzOOfSTLWbQAa4_3s3bD > ul > div > div.EkqzhLJ64MHFsU-MI8O0j > div > span > p > span._29wD8X2RKyThDSGBlnB_ZN').text)
+        self.assertEqual(claimNo, self.driver.find_element_by_css_selector(
+            '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > div._29qzOOfSTLWbQAa4_3s3bD > ul > div > div._1Qw7uHoAdUHtBsV2DUf1dN > div > div > p.ss-bold > a > span > em').text)
 
         # Clear search text
         self.driver.find_element_by_xpath(
@@ -334,8 +325,9 @@ class ViceRegressionSuite(unittest.TestCase):
         self.driver.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/input').send_keys(
             ' ', Keys.BACKSPACE)
+        time.sleep(1)
         self.assertEqual('Please start typing to initiate the search.', self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/p/span').text)
+            '//*[@id="app"]/div/div/div[2]/div/p').text)
 
         # Search for the Exposure associated with the claim
         self.driver.find_element_by_xpath(
@@ -344,12 +336,12 @@ class ViceRegressionSuite(unittest.TestCase):
         self.driver.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/input').send_keys(
             ' ' + claimNo)
-        self.assertEqual(claimNo, self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/ul/div/div[3]/div/div/p[1]/a/span/em').text)
+        self.assertEqual(claimNo, self.driver.find_element_by_css_selector(
+            '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > div._29qzOOfSTLWbQAa4_3s3bD > ul > div > div._1Qw7uHoAdUHtBsV2DUf1dN > div > div > p.ss-bold > a > span > em').text)
 
         # Select the claim link to view the claim
-        self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/ul/div/div[3]/div/div/p[1]/a/span/em').click()
+        self.driver.find_element_by_css_selector(
+            '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > div._29qzOOfSTLWbQAa4_3s3bD > ul > div > div._1Qw7uHoAdUHtBsV2DUf1dN > div > div > p.ss-bold > a > span > em').click()
         time.sleep(1)
 
     def test_7verifyChangeOfShop(self):
@@ -362,17 +354,22 @@ class ViceRegressionSuite(unittest.TestCase):
             '[data-test-id="shop-locator-card-details"] > div > span._13AJpbnc8oWgP-TGazCoK6').text
         self.assertEqual(shopCardName, self.__class__.currentPinnedLocation[:len(shopCardName)])
 
+
     def test_8logout(self):
         # Log out
-        self.driver.find_element_by_css_selector('[data-icon="user"]').click()
+        self.driver.find_element_by_css_selector(
+            '[data-icon="user"]').click()
         time.sleep(1)
-        self.driver.find_element_by_css_selector('[data-test-id="app-header-logout"]').click()
+        self.driver.find_element_by_css_selector(
+            '[data-test-id="app-header-logout"]').click()
         self.assertEqual('https://vice-frontend-integration.snapsheet.tech/login', self.driver.current_url)
 
     def is_element_present(self, how, what):
         try:
             self.driver.find_element(by=how, value=what)
         except NoSuchElementException as e:
+            exceptionTime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            self.driver.get_screenshot_as_file('screenshot-%s.png' % exceptionTime)
             return False
         return True
 

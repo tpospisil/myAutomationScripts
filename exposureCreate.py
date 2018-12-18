@@ -1,44 +1,31 @@
 #! python3/usr/bin/env
 
-import time, datetime, names, sys
+import time, datetime, names, sys, random
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
-def formatDateTime(currentDateTime):
-    if currentDateTime < 10:
-        currentDateTime = '0' + str(currentDateTime)
-    else:
-        currentDateTime = str(currentDateTime)
-    return currentDateTime
-
 def main():
 
-    now = datetime.datetime.now()
+    now = datetime.datetime.now().strftime('%m%d%H%M%S')
 
-    # Append '0' if month, day, hour, or minute is less than 10
-    month = formatDateTime(now.month)
-    day = formatDateTime(now.day)
-    hour = formatDateTime(now.hour)
-    minute = formatDateTime(now.minute)
-    second = formatDateTime(now.second)
+    email = 'tyler.pospisil+test@snapsheet.me'
 
-    email = 'fname.lname@snapsheet.me'
-
-    claimNo = 'claim' + month + day + hour + minute + second
-    policyNo = 'policy' + month + day + hour + minute + second
+    claimNo = 'claim' + now
+    policyNo = 'policy' + now
 
     firstName = names.get_first_name()
-    middleName = names.get_first_name()
     lastName = names.get_last_name()
     currentAddress = '62 O\'Connell Street Upper'
     currentCity = 'Dublin'
     currentCounty = '4'
+    cars = {'Toyota':['Camry','Corolla','Prius'], 'Honda':['Accord','Civic','CR-V'], 'Ford':['F-150','Escape','Focus']}
+    make, models = random.choice(list(cars.items()))
+    model = random.choice(models)
 
     driver = webdriver.Chrome()
 
     # Navigate to webpage
     driver.get("https://vice-frontend-integration.snapsheet.tech/")
-
 
     # Sign in
     driver.find_element_by_css_selector(
@@ -46,14 +33,14 @@ def main():
         email)
     driver.find_element_by_css_selector(
         '[data-test-id="login_form_password_input').send_keys(
-        "INSERTPASSWORDHERE")
+        "2Plustwoequalsfive!")
     driver.find_element_by_css_selector(
         '#app > div > div > div._1lWQjoWRvEuXiIoWRyOPYh > div > div:nth-child(6) > button').click()
     time.sleep(2)
 
     # Create New Claim
     driver.find_element_by_css_selector(
-        '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > div > button > span').click()
+        '#app > div > div > div.O2oH4V0LOoizIYDgzvgNj > div > div._266sD5YxjUkjzOakD2jBHv > button > span').click()
     driver.find_element_by_css_selector(
         '#app > div > div > div._1YlF0xeG8atxX5hpNMebqS > div > label:nth-child(3) > input').send_keys(
         policyNo)
@@ -93,7 +80,7 @@ def main():
         email)
     driver.find_element_by_xpath(
         '//label[@for="claimant.phone"]/following-sibling::input[1]').send_keys(
-        '3195412283')
+        '13195412283')
     driver.find_element_by_xpath(
         '//label[@for="vehicle.registrationNumber"]/following-sibling::input[1]').send_keys(
         '182-D-12345')
@@ -102,10 +89,10 @@ def main():
         '19XFC2F54JE004299')
     driver.find_element_by_xpath(
         '//label[@for="vehicle.make"]/following-sibling::input[1]').send_keys(
-        'Honda')
+        make)
     driver.find_element_by_xpath(
         '//label[@for="vehicle.model"]/following-sibling::input[1]').send_keys(
-        'Civic')
+        model)
     driver.find_element_by_xpath(
         '//label[@for="vehicle.year"]/following-sibling::input[1]').send_keys(
         '2018')
@@ -122,6 +109,9 @@ def main():
     # Click 'Save' to save new exposure
     driver.find_element_by_css_selector(
         '[data-test-id="exposure-new-view-save-button"]').click()
+    time.sleep(2)
+
+    print('\nYour Claim Number is %s.\n' % claimNo)
 
     driver.quit()
 

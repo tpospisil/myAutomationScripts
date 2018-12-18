@@ -1,6 +1,6 @@
 #! python3/usr/bin/env
 
-import time, names, sys, validators
+import time, names, sys, validators, random
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 
@@ -23,14 +23,16 @@ def main():
     if '/exposures' not in sys.argv[1]:
         raise Exception('\nPlease provide the link to an existing exposure list view page.\n')
 
-    email = 'fname.lname@snapsheet.me'
+    email = 'tyler.pospisil+test@snapsheet.me'
 
     firstName = names.get_first_name()
-    middleName = names.get_first_name()
     lastName = names.get_last_name()
     currentAddress = '62 O\'Connell Street Upper'
     currentCity = 'Dublin'
     currentCounty = '4'
+    cars = {'Toyota': ['Camry', 'Corolla', 'Prius'], 'Honda': ['Accord', 'Civic', 'CR-V'], 'Ford': ['F-150', 'Escape', 'Focus']}
+    make, models = random.choice(list(cars.items()))
+    model = random.choice(models)
 
     driver = webdriver.Chrome()
 
@@ -43,12 +45,13 @@ def main():
         email)
     driver.find_element_by_css_selector(
         '[data-test-id="login_form_password_input').send_keys(
-        "INSERTPASSWORDHERE")
+        "2Plustwoequalsfive!")
     driver.find_element_by_css_selector(
         '#app > div > div > div._1lWQjoWRvEuXiIoWRyOPYh > div > div:nth-child(6) > button').click()
     time.sleep(2)
 
     # Select 'New Exposure'
+    time.sleep(1)
     driver.find_element_by_css_selector(
         '[data-test-id="exposure-list-view-new-button"]').click()
 
@@ -77,7 +80,7 @@ def main():
         email)
     driver.find_element_by_xpath(
         '//label[@for="claimant.phone"]/following-sibling::input[1]').send_keys(
-        '3195412283')
+        '13195412283')
     driver.find_element_by_xpath(
         '//label[@for="vehicle.registrationNumber"]/following-sibling::input[1]').send_keys(
         '182-D-12345')
@@ -86,10 +89,10 @@ def main():
         '19XFC2F54JE004299')
     driver.find_element_by_xpath(
         '//label[@for="vehicle.make"]/following-sibling::input[1]').send_keys(
-        'Honda')
+        make)
     driver.find_element_by_xpath(
         '//label[@for="vehicle.model"]/following-sibling::input[1]').send_keys(
-        'Civic')
+        model)
     driver.find_element_by_xpath(
         '//label[@for="vehicle.year"]/following-sibling::input[1]').send_keys(
         '2018')
@@ -106,6 +109,7 @@ def main():
     # Click 'Save' to save new exposure
     driver.find_element_by_css_selector(
         '[data-test-id="exposure-new-view-save-button"]').click()
+    time.sleep(2)
 
     driver.quit()
 
