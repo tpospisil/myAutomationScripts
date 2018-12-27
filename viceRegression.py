@@ -11,7 +11,7 @@ from selenium.common.exceptions import NoAlertPresentException
 # Create test data
 now = datetime.datetime.now().strftime('%m%d%H%M%S')
 
-email = 'tyler.pospisil+test@snapsheet.me'
+email = 'INSERTEMAILHERE' # This email is used for login and will be the email listed on the created exposure
 
 claimNo = 'claim' + now
 policyNo = 'policy' + now
@@ -44,7 +44,7 @@ class ViceRegressionSuite(unittest.TestCase):
             email)
         self.driver.find_element_by_css_selector(
             '[data-test-id="login_form_password_input').send_keys(
-            "2Plustwoequalsfive!")
+            "INSERTPASSWORDHERE")  # Login password
         self.driver.find_element_by_css_selector(
             '#app > div > div > div._1lWQjoWRvEuXiIoWRyOPYh > div > div:nth-child(6) > button').click()
         time.sleep(2)
@@ -115,7 +115,7 @@ class ViceRegressionSuite(unittest.TestCase):
             email)
         self.driver.find_element_by_xpath(
             '//label[@for="claimant.phone"]/following-sibling::input[1]').send_keys(
-            '13195412283')
+            'INSERTPHONENUMBERHER') # Phone number listed on the exposure
         self.driver.find_element_by_xpath(
             '//label[@for="vehicle.registrationNumber"]/following-sibling::input[1]').send_keys(
             '182-D-12345')
@@ -254,11 +254,18 @@ class ViceRegressionSuite(unittest.TestCase):
         self.driver.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[1]/div[4]/button[2]/span').click()
         self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[1]').click()
+           '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[1]').click()
         time.sleep(1)
         smsBody = self.driver.find_element_by_xpath(
             '//*[@id="app"]/div/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div/div[2]/div[2]/div/div/div/div').text
-        locatorLink = re.search("(?P<url>https?://[^\s]+)", smsBody).group("url")
+
+        # Raise exception and grab screenshot if URL not found in History audit
+        try:
+            locatorLink = re.search("(?P<url>https?://[^\s]+)", smsBody).group("url")
+        except AttributeError as e:
+            exceptionTime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            self.driver.get_screenshot_as_file('screenshot-%s.png' % exceptionTime)
+        #locatorLink = re.search("(?P<url>https?://[^\s]+)", smsBody).group("url")
 
         # Navigate to customer link URL in a new browser session
         self.driver2.get(locatorLink)
