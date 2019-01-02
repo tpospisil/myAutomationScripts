@@ -261,11 +261,10 @@ class ViceRegressionSuite(unittest.TestCase):
 
         # Raise exception and grab screenshot if URL not found in History audit
         try:
-            locatorLink = re.search("(?P<url>https?://[^\s]+)", smsBody).group("url")
+            locatorLink = re.search("snpsh.me[^\s]+", smsBody).group()
         except AttributeError as e:
             exceptionTime = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
             self.driver.get_screenshot_as_file('screenshot-%s.png' % exceptionTime)
-        #locatorLink = re.search("(?P<url>https?://[^\s]+)", smsBody).group("url")
 
         # Navigate to customer link URL in a new browser session
         self.driver2.get(locatorLink)
