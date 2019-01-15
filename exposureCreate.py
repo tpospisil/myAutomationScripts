@@ -33,9 +33,9 @@ def main():
         email)
     driver.find_element_by_css_selector(
         '[data-test-id="login_form_password_input').send_keys(
-        "2Plustwoequalsfive!")
+        "INSERTPASSWORDHERE")
     driver.find_element_by_css_selector(
-        '#app > div > div > div._1lWQjoWRvEuXiIoWRyOPYh > div > div:nth-child(6) > button').click()
+        '#app > div > div._2YAjRhynbRDMGwIOqUCPA1 > div:nth-child(2) > div > div:nth-child(6) > button').click()
     time.sleep(2)
 
     # Create New Claim
