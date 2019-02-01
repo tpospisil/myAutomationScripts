@@ -4,7 +4,7 @@ import ssl
 import csv
 from datetime import datetime
 from testrail import *
-from pprint import pprint
+# from pprint import pprint
 
 def to_datetime(d):
     day, month, year = map(int, d.split('-'))
@@ -19,13 +19,12 @@ def main():
     _start = to_datetime(start)
     _end = to_datetime(end)
 
-    now = datetime.now().strftime('%m_%d_%Y')
-
     # Initialize variables and plan dictionaries
     Jun = Austin = Tyler = unassigned = totals = 0
     plan_dict = {}
     run_fails = {} # This will hold the number of failed runs per plan
     run_totals = {} # This will hold the run totals per assignee for each plan
+    defect_totals = {} # This will hold the defects per plan
 
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -41,10 +40,11 @@ def main():
         plan_dict[plans[i]['id']] = plans[i]['name'] # Dictionary over which we will iterate
         run_totals[plans[i]['name']] = 0 # Dictionary to hold run totals per assignee for each plan/product
         run_fails[plans[i]['name']] = 0 # Dictionary to hold the number of failed runs per each plan/product
+        defect_totals[plans[i]['name']] = 0
 
     # Begin pulling data and building csv output
     with open('run_data_master_' + start + '_' + end + '.csv', mode='w') as csv_file:
-        fieldnames = ['Build_Name', 'Create_Date', '#Passed', '#Failed', 'Assigned_To']
+        fieldnames = ['Build_Name', 'Create_Date', 'Assigned_To', '#Passed', '#Failed', 'Defects']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
@@ -63,7 +63,7 @@ def main():
             assignedTo = []
             buildName = []
             createDate = []
-            # defects = []
+            defects = []
             failed = []
             passed = []
             run_ids = []
@@ -99,18 +99,23 @@ def main():
                     user_run_totals['Unassigned'] += 1
                 if failed[i] != 0:
                     run_fails[v] += 1
-                # run_data = client.send_get('get_tests/' + str(run_ids[i]))
-                #                 # tests = []
-                #                 # run_defects = []
-                #                 # for j in range(len(run_data)):
-                #                 #     tests.append(run_data[i]['id'])
-                #                 #     for k in range(len(tests)):
-                #                 #         test_data = client.send_get('get_results/' + str(tests[k]))
-                #                 #         test_defects = test_data[len(test_data)-1]['defects']
-                #                 #         if test_defects == None:
-                #                 #             continue
-                #                 #         run_defects.append(test_defects)
-                #                 #     defects.append(run_defects)
+                run_data = client.send_get('get_tests/' + str(run_ids[i]))
+                tests = []
+                run_defects = []
+                for j in range(len(run_data)):
+                    tests.append(run_data[j]['id'])
+                for t in range(len(tests)):
+                    test_data = client.send_get('get_results/' + str(tests[t]))
+                    if len(test_data) > 0:
+                        test_defects = test_data[0]['defects']
+                    else:
+                        continue
+                    if test_defects == None:
+                        continue
+                    run_defects.append(test_defects)
+                defects.append(run_defects)
+                defect_totals[v] += len(defects[i])
+
 
             # Map user_run_totals for given plan/product
             run_totals[v] = user_run_totals
@@ -119,6 +124,7 @@ def main():
                              'Create_Date': '---',
                              '#Passed': '---',
                              '#Failed': '---',
+                             'Defects': '---',
                              'Assigned_To': '---'
                              })
 
@@ -127,6 +133,7 @@ def main():
                                  'Create_Date': createDate[i],
                                  '#Passed': passed[i],
                                  '#Failed': failed[i],
+                                 'Defects': ', '.join(defects[i]),
                                  'Assigned_To': assignedTo[i]
                                  })
 
@@ -134,16 +141,17 @@ def main():
                              'Create_Date': '---',
                              '#Passed': sum(passed),
                              '#Failed': sum(failed),
+                             'Defects': '---',
                              'Assigned_To': '---'
                              })
 
     # Write csv containing run totals by assignee by project
     with open('run_data_totals_' + start + '_' + end + '.csv', mode='w') as csv_file:
-        fieldnames = ['App', 'Jun Yang', 'Austin Curry', 'Tyler Pospisil', 'Unassigned', 'total_runs', 'runs_passed', 'runs_failed']
+        fieldnames = ['App', 'Jun Yang', 'Austin Curry', 'Tyler Pospisil', 'Unassigned', 'total_runs', 'runs_passed', 'runs_failed', 'defects_found']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
-        for (k, v), (k2, v2) in zip(run_totals.items(), run_fails.items()):
+        for (k, v), (k2, v2), (k3,v3) in zip(run_totals.items(), run_fails.items(), defect_totals.items()):
             Jun += int(v['Jun Yang'])
             Austin += int(v['Austin Curry'])
             Tyler += int(v['Tyler Pospisil'])
@@ -157,7 +165,8 @@ def main():
                 'Unassigned': v['Unassigned'],
                 'total_runs': v['Jun Yang'] + v['Austin Curry'] + v['Tyler Pospisil'] + v['Unassigned'],
                 'runs_passed': v['Jun Yang'] + v['Austin Curry'] + v['Tyler Pospisil'] + v['Unassigned'] - run_fails[k2],
-                'runs_failed': run_fails[k2]
+                'runs_failed': run_fails[k2],
+                'defects_found': defect_totals[k3]
             })
 
         writer.writerow({'App': 'TOTALS',
@@ -167,7 +176,8 @@ def main():
                          'Unassigned': unassigned,
                          'total_runs': totals,
                          'runs_passed': totals - sum(run_fails.values()),
-                         'runs_failed': sum(run_fails.values())
+                         'runs_failed': sum(run_fails.values()),
+                         'defects_found': sum(defect_totals.values())
                          })
 
 
