@@ -87,3 +87,17 @@ This script will run a quick sanity check of base functionality of the `vice-fro
 
 **Changes required in the script:**
 - User will need to input their own email, password, and phone number.
+
+## status_report_vice.py
+This script will generate two CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another for the list of outstanding issues contained in a given filter. Output files can be found in the current directory.
+
+**Pre-requisites**
+- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
+- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
+- jira-python (https://jira.readthedocs.io/en/master/index.html)
+- Jira API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
+
+**Changes required in the script:**
+- User will need to input their own Jira and TestRail username/email, as well as their respective API keys.
+
+This script will run a quick sanity check of base functionality of the `vice-frontend-integration` environment. Certain exceptions will capture and output a screenshot into the current directory.
