@@ -1,11 +1,11 @@
 #! python3/usr/bin/env
 
-import ssl
-import csv
-import itertools
+
+import csv, ssl
 import datetime
 from testrail import *
-from pprint import pprint
+from jira.client import JIRA
+# from pprint import pprint
 
 
 def passFailData(raw_data, milestone, passFail_dict, totals):
@@ -43,8 +43,8 @@ def main():
 
     # Provide authentication details for accessing TestRail's API
     client = APIClient('https://snapsheet.testrail.io/')
-    client.user = 'USERNAME HERE'
-    client.password = 'APIKEYHERE'
+    client.user = 'TESTRAIL USER EMAIL HERE'
+    client.password = 'TESTRAIL API KEY HERE'
 
     phase2_run_dict = {}
     phase2_plan_dict = {}
@@ -59,8 +59,8 @@ def main():
     phase2_run_data = client.send_get('get_runs/11')
     phase2_plan_data = client.send_get('get_plans/11')
 
-    phase2_plan_dict = passFailData(phase2_plan_data, 10, phase2_plan_dict, totals)
-    phase2_run_dict = passFailData(phase2_run_data, 10, phase2_run_dict, totals)
+    phase2_plan_dict = passFailData(phase2_plan_data, 11, phase2_plan_dict, totals)
+    phase2_run_dict = passFailData(phase2_run_data, 11, phase2_run_dict, totals)
 
     with open('VICE_status_' + now + '.csv', mode='w') as csv_file:
         fieldnames = ['Feature', 'Passed', 'Failed', 'Untested', 'Total', '% Passed', 'Pending Items']
@@ -78,6 +78,32 @@ def main():
                          '% Passed': round((totals['passed']/totals['total']) * 100),
                          'Pending Items': ''
                          })
+
+    options = {'server': 'https://snapsheettech.atlassian.net/'}
+    jira = JIRA(options, basic_auth=('JIRA USER EMAIL HERE', 'JIRA API KEY HERE'))
+
+    # favoriteFilters = jira.favourite_filters()
+
+    issues = jira.search_issues('filter=10040', maxResults=1000, json_result=True)
+
+    with open('VICE_bugs_' + now + '.csv', mode='w') as csv_file:
+        fieldnames = ['Key', 'Description', 'Severity', 'Component/s']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for i in range(len(issues['issues'])):
+
+            components = []
+            for j in range(len(issues['issues'][i]['fields']['components'])):
+                components.append(issues['issues'][i]['fields']['components'][j]['name'])
+
+            writer.writerow({'Key': issues['issues'][i]['key'],
+                             'Description': issues['issues'][i]['fields']['summary'],
+                             'Severity': issues['issues'][i]['fields']['customfield_10030']['value'],
+                             'Component/s': ", ".join(components)
+                             })
+
+    print('\nTotal Unresolved issues: ' + str(len(issues['issues'])) + '\n')
 
 if __name__ == "__main__":
     main()
