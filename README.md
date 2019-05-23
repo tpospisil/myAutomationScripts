@@ -4,6 +4,28 @@ Fun scripts to automate boring manual tasks :+1:
 All scripts require Python 3.X
 
 
+## status_report_vice.py
+This script will generate two CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another for the list of outstanding issues contained in a given filter. Output files can be found in the current directory.
+
+**Pre-requisites**
+- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
+- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
+- jira-python (https://jira.readthedocs.io/en/master/index.html)
+- Jira API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
+
+**Changes required in the script:**
+- User will need to input their own Jira and TestRail username/email, as well as their respective API keys.
+
+## configCreate.py
+This script creates a new configuration and test run in TestRail for QA's regression testing. The script will output the test run URL in the console.
+
+**Pre-requisites**
+- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
+- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
+
+**Changes required in the script:**
+- User will need to input their own TestRail username/email, as well as their API key.
+
 ## batchCreateDeliveredEstimate.py
 This script will automatically create a batch of assignments, which in turn are pushed all the way through the claim creation and estimate delivery workflow. The script will prompt the user in `terminal` to enter the number of estimates they would like to deliver. There is a small amount of setup work required for each user:
 
@@ -87,25 +109,3 @@ This script will run a quick sanity check of base functionality of the `vice-fro
 
 **Changes required in the script:**
 - User will need to input their own email, password, and phone number.
-
-## status_report_vice.py
-This script will generate two CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another for the list of outstanding issues contained in a given filter. Output files can be found in the current directory.
-
-**Pre-requisites**
-- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
-- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
-- jira-python (https://jira.readthedocs.io/en/master/index.html)
-- Jira API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
-
-**Changes required in the script:**
-- User will need to input their own Jira and TestRail username/email, as well as their respective API keys.
-
-## configCreate.py
-This script creates a new configuration and test run in TestRail for QA's regression testing. The script will output the test run URL in the console.
-
-**Pre-requisites**
-- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
-- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
-
-**Changes required in the script:**
-- User will need to input their own TestRail username/email, as well as their API key.
