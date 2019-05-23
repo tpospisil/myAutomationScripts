@@ -70,19 +70,19 @@ This script will automatically create a new Policy Request (single vehicle) on t
 - Alter the string sent to `loginEmail` to match intended user's username for the target server
 - Alter the string sent to `loginPwd` to match intended user's password for the target server
 
-## exposureCreate.py
+## exposureCreate.py (DEPRECATED)
 Creates an claim and adds a single exposure in the `vice-frontend-integration` environment.
 
 **Changes required in the script:**
 - User will need to input their own email, password, and phone number
 
-## addExposureToClaim.py
+## addExposureToClaim.py (DEPRECATED)
 Adds an exposure to an existing claim in the `vice-frontend-integration` environment. The script takes one command line argument in the form of the URL to an existing claim's exposure list view page. The script will throw an exception if the wrong URL has been included, or if the URL is not properly formatted.
 
 **Changes required in the script:**
 - User will need to input their own email, password, and phone number
 
-## viceRegression.py
+## viceRegression.py (DEPRECATED)
 This script will run a quick sanity check of base functionality of the `vice-frontend-integration` environment. Certain exceptions will capture and output a screenshot into the current directory.
 
 **Changes required in the script:**
@@ -100,4 +100,12 @@ This script will generate two CSV files--one for the test pass/fail status for a
 **Changes required in the script:**
 - User will need to input their own Jira and TestRail username/email, as well as their respective API keys.
 
-This script will run a quick sanity check of base functionality of the `vice-frontend-integration` environment. Certain exceptions will capture and output a screenshot into the current directory.
+## configCreate.py
+This script creates a new configuration and test run in TestRail for QA's regression testing. The script will output the test run URL in the console.
+
+**Pre-requisites**
+- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
+- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
+
+**Changes required in the script:**
+- User will need to input their own TestRail username/email, as well as their API key.
