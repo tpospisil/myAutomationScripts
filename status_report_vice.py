@@ -1,6 +1,5 @@
 #! python3/usr/bin/env
 
-
 import csv, ssl
 import datetime
 from testrail import *
@@ -43,8 +42,8 @@ def main():
 
     # Provide authentication details for accessing TestRail's API
     client = APIClient('https://snapsheet.testrail.io/')
-    client.user = 'TESTRAIL USER EMAIL HERE'
-    client.password = 'TESTRAIL API KEY HERE'
+    client.user = 'ENTER EMAIL HERE'
+    client.password = 'ENTER API KEY HERE'
 
     phase2_run_dict = {}
     phase2_plan_dict = {}
@@ -80,30 +79,39 @@ def main():
                          })
 
     options = {'server': 'https://snapsheettech.atlassian.net/'}
-    jira = JIRA(options, basic_auth=('JIRA USER EMAIL HERE', 'JIRA API KEY HERE'))
+    jira = JIRA(options, basic_auth=('ENTER EMAIL HERE', 'API TOKEN HERE'))
 
     # favoriteFilters = jira.favourite_filters()
 
-    issues = jira.search_issues('filter=10040', maxResults=1000, json_result=True)
+    total = jira.search_issues('filter=10040', maxResults=1000, json_result=True)['total']
 
     with open('VICE_bugs_' + now + '.csv', mode='w') as csv_file:
-        fieldnames = ['Key', 'Description', 'Severity', 'Component/s']
+        fieldnames = ['Key', 'Summary', 'Severity', 'Component/s']
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
 
-        for i in range(len(issues['issues'])):
+        block_num = 0
+        block_size = 100
 
-            components = []
-            for j in range(len(issues['issues'][i]['fields']['components'])):
-                components.append(issues['issues'][i]['fields']['components'][j]['name'])
+        while True:
+            start_idx = block_num*block_size
+            issues = jira.search_issues('filter=10040', startAt=start_idx, maxResults=block_size)
+            if len(issues) == 0:
+                break
+            block_num += 1
+            for issue in issues:
 
-            writer.writerow({'Key': issues['issues'][i]['key'],
-                             'Description': issues['issues'][i]['fields']['summary'],
-                             'Severity': issues['issues'][i]['fields']['customfield_10030']['value'],
-                             'Component/s': ", ".join(components)
-                             })
+                components = []
+                for i in range(len(issue.fields.components)):
+                    components.append(issue.fields.components[i].name)
 
-    print('\nTotal Unresolved issues: ' + str(len(issues['issues'])) + '\n')
+                writer.writerow({'Key': issue.key,
+                                 'Summary': issue.fields.summary,
+                                 'Severity': issue.fields.customfield_10030.value,
+                                 'Component/s': ", ".join(components)
+                                 })
+
+    print('\nTotal Unresolved issues: ' + str(total) + '\n')
 
 if __name__ == "__main__":
     main()
