@@ -5,7 +5,7 @@ All scripts require Python 3.X
 
 
 ## status_report_vice.py
-This script will generate two CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another for the list of outstanding issues contained in a given filter. Output files can be found in the current directory.
+This script will generate three CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another two for the list of outstanding issues contained in given filter(s). Output files can be found in the current directory.
 
 **Pre-requisites**
 - testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
