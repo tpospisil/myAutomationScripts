@@ -11,8 +11,8 @@ def passFailData(raw_data, milestone, passFail_dict, totals):
     for i in range(len(raw_data)):
         if raw_data[i]['milestone_id'] == milestone:
             passFail_dict[raw_data[i]['name']] = {'Passed': raw_data[i]['passed_count'],
-                                                  'Failed': raw_data[i]['failed_count'] + raw_data[i]['retest_count'] + raw_data[i]['blocked_count'],
-                                                  'Untested': raw_data[i]['untested_count'],
+                                                  'Failed': raw_data[i]['failed_count'] + raw_data[i]['blocked_count'],
+                                                  'Untested': raw_data[i]['untested_count']+ raw_data[i]['retest_count'],
                                                   'Total': raw_data[i]['passed_count'] + raw_data[i]['failed_count'] + raw_data[i]['retest_count'] + raw_data[i]['blocked_count'] + raw_data[i]['untested_count']
                                                   }
             totals['passed'] += passFail_dict[raw_data[i]['name']]['Passed']
@@ -112,6 +112,38 @@ def main():
                                  })
 
     print('\nTotal Unresolved issues: ' + str(total) + '\n')
+
+    total_zire = jira.search_issues('filter=10123', maxResults=1000, json_result=True)['total']
+
+    with open('ZIRE_bugs_' + now + '.csv', mode='w') as csv_file:
+        fieldnames = ['Key', 'Summary', 'Severity', 'Component/s']
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+
+        block_num = 0
+        block_size = 100
+
+        while True:
+            start_idx = block_num * block_size
+            issues = jira.search_issues('filter=10123', startAt=start_idx, maxResults=block_size)
+            if len(issues) == 0:
+                break
+            block_num += 1
+            for issue in issues:
+
+                components = []
+                for i in range(len(issue.fields.components)):
+                    components.append(issue.fields.components[i].name)
+
+                writer.writerow({'Key': issue.key,
+                                 'Summary': issue.fields.summary,
+                                 'Severity': issue.fields.customfield_10030.value,
+                                 'Component/s': ", ".join(components)
+                                 })
+
+    print('Total Unresolved Zurich issues: ' + str(total_zire) + '\n')
+
+    print('Test cases passed = ' + str(round((totals['passed']/totals['total']) * 100)) + '%\n')
 
 if __name__ == "__main__":
     main()
