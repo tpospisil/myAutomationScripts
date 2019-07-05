@@ -35,13 +35,12 @@ def main():
             print('Ya blew it...')
             sys.exit(1)
 
-    # if product.lower() in ['vice','vc']:
-    #     # project = 'VC'
-    # elif product.lower() in ['dispatch', 'dis']:
-    #     # project = 'DIS'
-    # elif product.lower() in ['workflow', 'wrk']:
-    #     project = 'WRK'
-    project = 'SBX'
+    if product.lower() in ['vice','vc']:
+        project = 'VC'
+    elif product.lower() in ['dispatch', 'dis']:
+        project = 'DIS'
+    elif product.lower() in ['workflow', 'wrk']:
+        project = 'WRK'
 
     if environment.lower() == 'integration':
         statusInfo = statusDict['integration']
