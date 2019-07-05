@@ -4,6 +4,16 @@ Fun scripts to automate boring manual tasks :+1:
 All scripts require Python 3.X
 
 
+## jiraMagic.py
+This script automates Jira issue updates for integration and UAT deployments for the VICE (VC), Dispatch (DIS), and Workflow (WRK) projects. Given user inputs, the script will generate a Fix Version, tag the appropriate issues, and transition those issues accordingly.
+
+**Pre-requisites**
+- jira-python (https://jira.readthedocs.io/en/master/index.html)
+- Jira API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
+
+**Changes required in the script:**
+- User will need to input Jira username/email and API key.
+
 ## status_report_vice.py
 This script will generate three CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another two for the list of outstanding issues contained in given filter(s). Output files can be found in the current directory.
 
