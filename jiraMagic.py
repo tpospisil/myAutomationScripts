@@ -1,7 +1,7 @@
 #! python3/usr/bin/env
 
 import sys
-from jira.client import JIRA
+from jira import JIRA, JIRAError
 
 def main():
 
@@ -18,7 +18,7 @@ def main():
     # Determine which product is to be deployed
     product = input('Is this a \"VICE\", \"Workflow\", or \"Dispatch\" deployment?\n')
 
-    while product.lower() not in ['vice','dispatch','dis','vc', 'workflow', 'wrk']:
+    while product.lower() not in ['vice', 'dispatch', 'dis', 'vc', 'workflow', 'wrk']:
         try:
             product = input('Invalid selection. Try again...\n')
         except:
@@ -35,12 +35,15 @@ def main():
             print('Ya blew it...')
             sys.exit(1)
 
+
+    # Assign appropriate values to variables based on selections
     if product.lower() in ['vice','vc']:
         project = 'VC'
     elif product.lower() in ['dispatch', 'dis']:
         project = 'DIS'
     elif product.lower() in ['workflow', 'wrk']:
         project = 'WRK'
+    # project = 'SBX'
 
     if environment.lower() == 'integration':
         statusInfo = statusDict['integration']
@@ -50,11 +53,19 @@ def main():
 
     # Authenticate
     options = {'server': 'https://snapsheettech.atlassian.net/'}
-    jira = JIRA(options, basic_auth=('USER EMAIL HERE', 'API KEY HERE'))
+    jira = JIRA(options, basic_auth=('EMAIL HERE', 'API KEY HERE'))
 
-    # Create new version in the appropriate project
+    # Create new version in the appropriate project. Use existing version if matching version already exists.
     version = input('Please provide a name for the Fix Version: ')
-    newVersion = jira.create_version(version,project)
+    try:
+        newVersion = jira.create_version(version,project)
+    except:
+        projectVersions = jira.project_versions(project)
+        for i in range(len(projectVersions)):
+            if projectVersions[i].name == version:
+                newVersion = projectVersions[i]
+        pass
+
 
     # Transition issues and add new Fix Version
     print('\nWorking... This may take some time.\n')
