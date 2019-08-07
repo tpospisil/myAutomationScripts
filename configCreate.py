@@ -2,6 +2,7 @@
 
 import ssl, sys
 from testrail import *
+from jira import JIRA
 
 def relevantIDs(userInput, id_dict):
     plan_id = str(id_dict[userInput]['plan_id'])
@@ -11,12 +12,18 @@ def relevantIDs(userInput, id_dict):
 
 def main():
 
+    user_details = {
+        'name': 'ENTER NAME HERE',
+        'email': 'ENTER EMAIL HERE'
+    }
+
     ssl._create_default_https_context = ssl._create_unverified_context
 
     # Provide authentication details for accessing TestRail's API
     client = APIClient('https://snapsheet.testrail.io/')
-    client.user = 'INSERT EMAIL HERE'
-    client.password = 'INSERT API KEY HERE'
+    client.user = user_details['email']
+    client.password = 'ENTER API KEY HERE'
+
 
     # Dictionary to hold relevant IDs from QA Regression project
     id_dict = {1: {'plan_id': 150,
@@ -59,9 +66,6 @@ def main():
                    'suite_id': 69,
                    'project': 'Policy App'
                    }
-               # 'VICE Automation': {'plan_id': 224,
-               #                     'configGroup_id': 27,
-               #                     'suite_id': 89},
                }
 
     print(
@@ -86,7 +90,7 @@ def main():
 
     plan_id, configGroup_id, suite_id = relevantIDs(userInput, id_dict)
 
-    buildName = input('Please enter a name for the new build: ')
+    buildName = input('\nPlease enter a name for the new build: ')
 
     newConfig = client.send_post('add_config/' + configGroup_id, {'name': buildName})
 
@@ -101,6 +105,25 @@ def main():
             }
         ]
     })
+
+
+    # Provide authentication details for Jira
+    options = {'server': 'https://snapsheettech.atlassian.net/'}
+    jira = JIRA(options, basic_auth=(user_details['email'], 'ENTER API TOKEN HERE'))
+
+    createTask = input('Do you want to create a Jira task for this test run? (Yes/No): ')
+
+    while createTask.lower() not in ['y','n','yes','no']:
+        try:
+            createTask = input('Try again...')
+        except:
+            pass
+
+    if createTask.lower() in ['y','yes']:
+        jira.create_issue(project='QA', summary='Regression Run - %s' % buildName, issuetype='Task',
+                          description=addNewConfig['runs'][0]['url'], assignee={'name':user_details['name']})
+    else:
+        pass
 
     print("\nHere\'s the URL for the new " + id_dict[userInput]['project'] + " build: " + addNewConfig['runs'][0]['url'] + "\n")
 
