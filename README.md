@@ -27,14 +27,18 @@ This script will generate three CSV files--one for the test pass/fail status for
 - User will need to input their own Jira and TestRail username/email, as well as their respective API keys.
 
 ## configCreate.py
-This script creates a new configuration and test run in TestRail for QA's regression testing. The script will output the test run URL in the console.
+This script creates a new configuration and test run in TestRail for QA's regression testing. The script will output the test run URL in the console. The script also gives the user the option of creating a Task in the QA project for the associated regression test run.
 
 **Pre-requisites**
 - testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
 - TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
+- jira-python (https://jira.readthedocs.io/en/master/index.html)
+- Jira API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
 
 **Changes required in the script:**
-- User will need to input their own TestRail username/email, as well as their API key.
+- User will need to input the email address associated with their Jira and TestRail accounts in `user_details['email']`
+- User will need to input their name (first and last, as it appears in Jira) in `user_details['name']`
+- User will need to enter their Jira and TestRail API keys
 
 ## batchCreateDeliveredEstimate.py
 This script will automatically create a batch of assignments, which in turn are pushed all the way through the claim creation and estimate delivery workflow. The script will prompt the user in `terminal` to enter the number of estimates they would like to deliver. There is a small amount of setup work required for each user:
