@@ -64,7 +64,6 @@ def main():
     elif product.lower() in ['workflow', 'wrk']:
         project = 'WRK'
     else:
-        project = None
         print('Whomp whomp... Something went wrong.')
         sys.exit(1)
     # project = 'SBX'
