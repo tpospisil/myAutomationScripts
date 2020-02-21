@@ -3,6 +3,17 @@ Fun scripts to automate boring manual tasks :+1:
 
 All scripts require Python 3.X
 
+## generate_status_report.py
+This script will generate a CSV files with test pass/fail status for a given Milestone in a TestRail project based on user input. Output file can be found in the current directory.
+
+**Pre-requisites**
+- testrail.py (http://docs.gurock.com/testrail-api2/bindings-python)
+- TestRail API key (http://docs.gurock.com/testrail-api2/accessing)
+- jira-python (https://jira.readthedocs.io/en/master/index.html)
+- Jira API token (https://confluence.atlassian.com/cloud/api-tokens-938839638.html)
+
+**Changes required in the script:**
+- User will need to input their TestRail username/email, as well as their API key.
 
 ## jiraMagic.py
 This script automates Jira issue updates for integration and UAT deployments for the VICE (VC), Dispatch (DIS), and Workflow (WRK) projects. Given user inputs, the script will generate a Fix Version, tag the appropriate issues, and transition those issues accordingly.
@@ -14,7 +25,7 @@ This script automates Jira issue updates for integration and UAT deployments for
 **Changes required in the script:**
 - User will need to input Jira username/email and API key.
 
-## status_report_vice.py
+## status_report_vice.py (DEPRECATED)
 This script will generate three CSV files--one for the test pass/fail status for a given Milestone in a TestRail project and another two for the list of outstanding issues contained in given filter(s). Output files can be found in the current directory.
 
 **Pre-requisites**
