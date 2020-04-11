@@ -1,24 +1,28 @@
 #! python3/usr/bin/env
 
 import ssl, sys
+import argparse
 from testrail import *
 from jira import JIRA
 
 
-def relevantIDs(userInput, id_dict):
-    plan_id = str(id_dict[userInput]['plan_id'])
-    configGroup_id = str(id_dict[userInput]['configGroup_id'])
+def getSuiteId(userInput, id_dict):
     suite_id = id_dict[userInput]['suite_id']
-    return (plan_id, configGroup_id, suite_id)
+    return (suite_id)
 
 
 def main():
 
+    parser = argparse.ArgumentParser(description='Creates TestRail Test Runs and Jira tasks for test execution')
+    parser.add_argument('--filter', dest='filter', action='store_false',
+                        help='will also add test cases which have been automated')
+    args = parser.parse_args()
+
     user_details = {
         'id': 'ATLASSIAN ID HERE',
-        'email': 'JIRA/TESTRAIL EMAIL HERE',
-        'jiraKey': 'JIRA API KEY HERE',
-        'testrailKey': 'TESTRAIL API KEY HERE'
+        'email': 'EMAIL HERE',
+        'jiraKey': 'ATLASSIAN KEY HERE',
+        'testrailKey': 'TESTRAIL KEY HERE'
     }
 
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -30,36 +34,28 @@ def main():
 
 
     # Dictionary to hold relevant IDs from QA Regression project
-    id_dict = {1: {'plan_id': 150,
-                   'suite_id': 64,
+    id_dict = {1: {'suite_id': 64,
                    'project': 'S2'
                    },
-               2: {'plan_id': 184,
-                   'suite_id': 112,
+               2: {'suite_id': 112,
                    'project': 'VICE'
                    },
-               3: {'plan_id': 233,
-                   'suite_id': 92,
+               3: {'suite_id': 92,
                    'project': 'SnapTx'
                    },
-               4: {'plan_id': 142,
-                   'suite_id': 67,
+               4: {'suite_id': 67,
                    'project': 'Shops'
                    },
-               5: {'plan_id': 138,
-                   'suite_id': 66,
+               5: {'suite_id': 66,
                    'project': 'Hertz'
                    },
-               6: {'plan_id': 159,
-                   'suite_id': 68,
+               6: {'suite_id': 68,
                    'project': 'S1'
                    },
-               7: {'plan_id': 192,
-                   'suite_id': 78,
+               7: {'suite_id': 78,
                    'project': 'Turo'
                    },
-               8: {'plan_id': 154,
-                   'suite_id': 69,
+               8: {'suite_id': 69,
                    'project': 'Policy App'
                    }
                }
@@ -84,16 +80,27 @@ def main():
             print('That\'s not a number...')
             sys.exit(1)
 
-    plan_id, configGroup_id, suite_id = relevantIDs(userInput, id_dict)
+    caseIdArray = []
+    testCases = client.send_get("get_cases/10&suite_id=%s" % (str(getSuiteId(userInput, id_dict))))
+    for index in range(len(testCases)):
+        if testCases[index]['custom_test_case_automated'] is not True:
+            caseIdArray.append(testCases[index]['id'])
 
     buildName = input('\nPlease enter a name for the new build: ')
 
-    newRun = client.send_post('add_run/10', {
-        'suite_id': suite_id,
-        'name': buildName,
-        'include_all': True
-    })
-
+    if args.filter is not False:
+        newRun = client.send_post('add_run/10', {
+            'suite_id': getSuiteId(userInput, id_dict),
+            'name': buildName,
+            'include_all': False,
+            'case_ids': caseIdArray
+        })
+    else:
+        newRun = client.send_post('add_run/10', {
+            'suite_id': getSuiteId(userInput, id_dict),
+            'name': buildName,
+            'include_all': True
+        })
 
     # Provide authentication details for Jira
     options = {'server': 'https://snapsheettech.atlassian.net/'}
@@ -106,7 +113,6 @@ def main():
             createTask = input('Try again...')
         except:
             pass
-
 
     if createTask.lower() in ['y', 'yes']:
         task = jira.create_issue(project='QA', summary='%s - Regression Run' % buildName, issuetype={'name': 'Task'},
@@ -126,8 +132,7 @@ def main():
     else:
         pass
 
-
-    print("\nHere\'s the URL for the new " + id_dict[userInput]['project'] + " build: " + newRun['url'] + "\n")
+    print("\nHere\'s the URL for the new %s build: %s \n" % (id_dict[userInput]['project'], newRun['url']))
 
 if __name__ == "__main__":
     main()
